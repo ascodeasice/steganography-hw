@@ -38,5 +38,4 @@ Enter the cleartext : 在成年禮以後見我
 
 ## Note
 
-- Trying to encode text with comma will make decoding fail
 - This program is meant to encode chinese characters

@@ -15,7 +15,7 @@ def encode(cleartext):
         MAX_SENTENCE_SIZE = 100
         SENTENCE_SIZE = random.randint(MIN_SENTENCE_SIZE, MAX_SENTENCE_SIZE)
 
-        MIN_COMMA_COUNT = max(0, MIN_SENTENCE_SIZE // 3 - 1)
+        MIN_COMMA_COUNT = 0
         # make sure no consecutive comma
         MAX_COMMA_COUNT = max(0, SENTENCE_SIZE // 3 - 2)
         comma_count = random.randint(MIN_COMMA_COUNT, MAX_COMMA_COUNT)
@@ -25,6 +25,11 @@ def encode(cleartext):
         # encoding comma
         if char in commas:
             char_position += 1
+
+        # encoding endings
+        if char in endings:
+            result += char
+            continue
 
         sentence_chars = [get_random_char() for _ in range(SENTENCE_SIZE)]
         sentence_chars[char_position] = char
@@ -55,13 +60,22 @@ def encode(cleartext):
 
 def decode(ciphertext):
     commas = ["，", "、"]
-    pattern = "[。？！]"
+    pattern = "([。？！])"
+    endings = ["。", "！", "？"]
+
+    # split while still preserving the ending character
     sentences = re.split(pattern, ciphertext)
 
     result = ""
-    for sentence in sentences:
+    for i, sentence in enumerate(sentences):
+        # user tried to encode one ending character
         if len(sentence) == 0:
+            if i + 1 < len(sentences) and sentences[i + 1] in endings:
+                result += sentences[i + 1]
             continue
+        if sentence in endings:
+            continue
+
         comma_count = 0
         for char in sentence:
             if char in commas:
