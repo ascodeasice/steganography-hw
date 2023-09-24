@@ -16,20 +16,26 @@ def encode(cleartext):
         SENTENCE_SIZE = random.randint(MIN_SENTENCE_SIZE, MAX_SENTENCE_SIZE)
 
         MIN_COMMA_COUNT = max(0, MIN_SENTENCE_SIZE // 3 - 1)
-        # minus one to make sure every comma is between two characters, and comma can't be target
-        MAX_COMMA_COUNT = SENTENCE_SIZE // 3 - 1
-        COMMA_COUNT = random.randint(MIN_COMMA_COUNT, MAX_COMMA_COUNT)
+        # make sure no consecutive comma
+        MAX_COMMA_COUNT = max(0, SENTENCE_SIZE // 3 - 2)
+        comma_count = random.randint(MIN_COMMA_COUNT, MAX_COMMA_COUNT)
+
+        char_position = comma_count
+
+        # encoding comma
+        if char in commas:
+            char_position += 1
 
         sentence_chars = [get_random_char() for _ in range(SENTENCE_SIZE)]
-        sentence_chars[COMMA_COUNT] = char
+        sentence_chars[char_position] = char
 
-        #  skip start, end, and COMMA_COUNT
-        valid_comma_position = list(range(1, COMMA_COUNT)) + list(
-            range(COMMA_COUNT + 1, SENTENCE_SIZE - 1)
+        #  skip start, end, and character position
+        valid_comma_position = list(range(1, char_position)) + list(
+            range(char_position + 1, SENTENCE_SIZE - 1)
         )
 
         # insert comma
-        for _ in range(COMMA_COUNT):
+        for _ in range(comma_count):
             position = random.choice(valid_comma_position)
             # plus i because there are commas before it
             sentence_chars[position] = random.choice(commas)
